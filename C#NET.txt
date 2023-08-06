@@ -1,0 +1,569 @@
+// Operatore Overloading
+_________________________
+public class complex
+{
+    int a;
+    int b;
+    complex()
+    {
+
+    }
+
+    complex(int x,int y)
+    {
+        a = x;
+        b=y;
+    }
+
+    public void disp()
+    {
+        Console.WriteLine(a + "+" + b + "i");
+    }
+
+    public static complex operator +(complex c1, complex c2)
+    {
+        complex t = new complex();
+        t.a = c1.a + c2.a;
+        t.b = c1.b + c2.b;    
+
+        return t;
+    }
+
+    static void Main(string[] args)
+    {
+        complex c1 = new complex(2, 3);
+        complex c2 = new complex(4, 5);
+        complex c3 = new complex();
+
+
+        c3 = c1 + c2;
+        c1.disp();
+        c2.disp();
+        c3.disp();
+    }
+}
+
+
+__________
+// Delegate
+___________
+
+public delegate int operation(int a, int b);
+
+class prog
+{
+    public int sum(int a,int b)
+    {
+        return a + b;
+    }
+
+    static void Main(string[] args)
+    {
+        prog p1 = new prog();
+        operation op1 = new operation(p1.sum);
+
+        Console.WriteLine(op1(1,3));
+    }
+}
+
+
+
+
+
+
+
+___________
+
+// ADO.NET
+____________
+using System.Data.SqlClient;
+
+    internal class dbconnectivity
+    {
+        static void Main()
+        {
+            string connString = @"Data Source=SHIRSHENDU\SQLEXPRESS;Integrated Security=True";
+
+            
+
+            SqlConnection conn = new SqlConnection(connString);
+            
+            try
+            {
+                conn.Open();
+
+                SqlCommand cmd1 = new SqlCommand("select * from student", conn);
+                SqlDataReader dr = cmd1.ExecuteReader();
+                while (dr.Read())
+                {
+                    Console.Write(dr[0]+" ");
+                    Console.Write(dr[1]);
+                    Console.Write(dr[2]);
+                    Console.WriteLine("");
+                }
+            }
+
+            catch (Exception e)
+            {
+                Console.WriteLine("Error: " + e);
+            }
+
+            finally
+            {
+                conn.Close();
+            }
+
+            Console.ReadKey();
+        }
+    }
+
+
+
+_____________
+// Addition
+______________
+class add
+{
+    static void Main(string[] args)
+    {
+        int a;
+        a = Convert.ToInt32(Console.ReadLine());
+
+        Console.WriteLine(a+4);
+    }
+}
+
+
+
+_________________
+// Jagged Arrays
+_________________
+class jag_arrays
+{
+    static void Main(string[] args)
+    {
+
+        int[][] ar = new int[3][];
+
+        ar[0] = new int[]{ 1, 2, 3 };
+        ar[1] = new int[] { 1, 2, 3 ,4};
+        ar[2] = new int[] {1, 2, 3, 4 ,5};
+
+        for(int i=0; i<ar.Length; i++)
+        {
+            for(int j=0; j < ar[i].Length; j++)
+                Console.Write(ar[i][j]+" ");
+
+            Console.WriteLine();
+
+        }
+
+    }
+}
+
+
+
+
+
+________________
+// Get and Set
+________________
+using System;
+namespace PropertyDemo
+{
+    public class Employee
+    {
+        //Private Data Members
+        public int EmpId;
+        public string EmpName;
+        //Public Properties
+        public int _EmpId
+        {
+            //The Set Accessor is used to set the EmpId private variable value
+            set
+            {
+                EmpId = value;
+            }
+            //The Get Accessor is used to return the EmpId private variable value
+            get
+            {
+                return EmpId;
+            }
+        }
+        public string _EmpName
+        {
+            //The Set Accessor is used to set the EmpName private variable value
+            set
+            {
+                EmpName = value;
+            }
+            //The Get Accessor is used to return the EmpName private variable value
+            get
+            {
+                return EmpName;
+            }
+        }
+    }
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Employee employee = new Employee();
+            
+            employee.EmpId = 1000;
+            employee.EmpName = "Kalpana";
+           
+
+            Console.WriteLine("Employee Details:");
+            Console.WriteLine("Employee id:" + employee.EmpId);
+            Console.WriteLine("Employee name:" + employee.EmpName);
+            Console.ReadKey();
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+___________
+// LINQ   |
+___________
+model.cs
+public class Student
+{
+    public int StudentID { get; set; }
+    public string StudentName { get; set; }
+}
+
+context.cs
+-------------
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.Metrics;
+using System;
+public class SchoolContext : DbContext
+{
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseSqlServer(@"Data Source = (localdb)\MSSQLLocalDB; 
+Database=StudentDatabase;Initial Catalog = master; Integrated Security = True; Connect 
+Timeout = 30; Encrypt = False; TrustServerCertificate = False; ApplicationIntent = ReadWrite; 
+MultiSubnetFailover = False");
+    }
+    public DbSet<Student> Students { get; set; }
+}
+
+
+program.cs
+-----------
+class Program
+{
+    static void Main(string[] args)
+    {
+        using (var ctx = new SchoolContext())
+        {
+            Console.Write("Enter a name and id for a new student ");
+            var name = Console.ReadLine();
+            var stud = new Student() { StudentName = name };
+            ctx.Students.Add(stud);
+            ctx.SaveChanges();
+            //fetching
+            var query = from b in ctx.Students
+                        select b;
+            Console.WriteLine("All students in the database:");
+            foreach (var item in query)
+            {
+                Console.WriteLine(item.StudentName);
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+__________________
+// LINQ PROCEDURE
+__________________
+using System.Collections.Generic;
+using System.Reflection;
+
+spGetStudents.cs
+Place the below code inside up method
+var sp = @"CREATE PROCEDURE [dbo].[GetStudents]
+ @FirstName varchar(50)
+ AS
+ BEGIN
+ SET NOCOUNT ON;
+ select * from Students where StudentName like @FirstName +'%'
+ END";
+migrationBuilder.Sql(sp);
+model.cs
+public class Student
+{
+    public int StudentID { get; set; }
+    public string StudentName { get; set; }
+}
+context.cs
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.Metrics;
+using System;
+public class SchoolContext : DbContext
+{
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseSqlServer(@"Data Source = (localdb)\MSSQLLocalDB; 
+Database=StudentDatabase;Initial Catalog = master; Integrated Security = True; Connect 
+Timeout = 30; Encrypt = False; TrustServerCertificate = False; ApplicationIntent = ReadWrite; 
+MultiSubnetFailover = False");
+    }
+    public DbSet<Student> Students { get; set; }
+}
+
+program.cs
+-------------
+using Microsoft.EntityFrameworkCore;
+class Program
+{
+    static void Main(string[] args)
+    {
+        using (var ctx = new SchoolContext())
+        {
+
+            var result = ctx.Students.FromSqlRaw("GetStudents J").ToList();
+            Console.WriteLine("All students in the database:");
+            foreach (var item in result)
+            {
+                Console.WriteLine(item.StudentName);
+            }
+        }
+    }
+}
+
+
+
+
+
+
+____________
+// ADO.NET
+____________
+using Microsoft.Data.SqlClient;
+namespace ConsoleApp10
+{
+    internal class dbconnectivity
+    {
+        static void Main()
+        {
+            string connString = @"Data Source=DESKTOP-SM9K961\SQLEXPRESS;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=True;Application Intent=ReadWrite;Multi Subnet Failover=False";
+
+            
+            SqlConnection conn = new SqlConnection(connString);
+
+            try
+            {
+                conn.Open();
+
+                SqlCommand cmd1 = new SqlCommand("select * from students", conn);
+                SqlDataReader dr = cmd1.ExecuteReader();
+
+                while (dr.Read())
+                {
+                    Console.WriteLine(dr[0]);
+                    Console.WriteLine(dr[1]);
+                    Console.WriteLine(dr[2]);
+                    Console.WriteLine("");
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error: " + e);
+            }
+            finally
+            {
+                conn.Close();
+            }
+            Console.ReadKey();
+        }
+    }
+}
+
+
+
+
+
+
+_______
+// MVC
+_______
+StudentController.cs
+-----------------------
+using Microsoft.AspNetCore.Mvc;
+using MVCDemo2.Models;
+
+namespace MVCDemo2.Controllers
+{
+    public class StudentController : Controller
+    {
+        // /student
+        public IActionResult Index()
+        {
+            DatabaseAccessLayer da = new DatabaseAccessLayer();
+            var student = da.getStudents();
+            return View(student);
+        }
+        // /student/register
+        public IActionResult register()
+        {
+            return View();
+        }
+        // /student/Insert
+        public void Insert(Student s)
+        {
+            DatabaseAccessLayer da = new DatabaseAccessLayer();
+            da.InsertStudent(s);
+        }
+    }
+}
+
+
+Models/DatabaseAccessLayer.cs
+-------------------------------
+using Microsoft.Data.SqlClient;
+
+namespace MVCDemo2.Models
+{
+    public class DatabaseAccessLayer
+    {
+        List<Student> Students = new List<Student>();
+        public List<Student> getStudents()
+        {
+            string connString = @"Data Source=DESKTOP-SM9K961\SQLEXPRESS;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False ";
+            SqlConnection conn = new SqlConnection(connString);
+            try
+            {
+                conn.Open();
+                SqlCommand cmd1 = new SqlCommand("select * from Students", conn);
+                SqlDataReader dr = cmd1.ExecuteReader();
+                while (dr.Read())
+                {
+                    Student stud = new Student();
+                    stud.StudentName = dr[1].ToString();
+                    Students.Add(stud);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error: " + e);
+            }
+            finally
+            {
+                conn.Close();
+            }
+            return Students;
+        }
+        public void InsertStudent(Student s)
+        {
+            string connString = @"Data Source=DESKTOP-SM9K961\SQLEXPRESS;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False";
+            SqlConnection conn = new SqlConnection(connString);
+            string INSERT_TABLE = @"insert into Students(StudentName) values('" +
+            s.StudentName + "')";
+            try
+            {
+                conn.Open();
+                SqlCommand cmd1 = new SqlCommand(INSERT_TABLE, conn);
+                cmd1.ExecuteNonQuery();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error: " + e);
+            }
+            finally
+            {
+                conn.Close();
+            }
+        }
+
+    }
+}
+
+Models/StudetModel.cs
+-------------------------
+namespace MVCDemo2.Models
+{
+    public class Student
+    {
+        public int Id { get; set; }
+        public string StudentName { get; set; }
+    }
+}
+
+
+Views/Student/Index.cshtml
+---------------------------
+@using MVCDemo2.Models
+
+@model List<Student>
+<h1>List of Students</h1>
+@foreach (var s in Model)
+{
+    <h1>@s.StudentName</h1>
+    <br />
+}
+
+Views/Student/register.cshtml
+------------------------------
+@model MVCDemo2.Models.Student;
+<form asp-action="Insert">
+    ID<input type="text" asp-for="Id"><br />
+    Name<input type="text" asp-for="StudentName"><br />
+    <input type="submit" value="insert">
+</form>
+
+
+
+
+
+
+
+______________
+// Validation 
+______________
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+
+namespace ValidationDemo.Models
+{
+    public class Student
+    {
+        [Display(Name = "ID1")]
+        public int ID { get; set; }
+        // -- Validating Student Name 
+        [Required]
+        [MaxLength(12)]
+        public string Name { get; set; }
+        // -- Validating Email Address 
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress]
+        public string Email { get; set; }
+        // -- Validating Contact Number 
+        [Required(ErrorMessage = "Contact is required")]
+        [DataType(DataType.PhoneNumber)]
+        [RegularExpression(@"^([0-9]{10})$", ErrorMessage = "Invalid Phone Number.")]
+        public string Contact { get; set; }
+    }
+}
+
+
+
+
+
